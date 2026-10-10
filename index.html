@@ -4,10 +4,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Ninja Jump 4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none}canvas{display:block;width:100vw;height:100vh}
+button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none}canvas{display:block;width:100vw;height:calc(100vh - 132px)}
 #hud{position:fixed;z-index:4;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
-.btn{position:fixed;z-index:8;bottom:max(18px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
-#L,#R{width:78px;height:78px;font-size:30px}#L{left:14px}#R{left:102px}#J{right:16px;width:100px;height:100px;background:#b45309dd}#D{right:126px;width:72px;height:72px;background:#047857dd;font-size:12px}
+.btn{position:fixed;z-index:8;bottom:max(12px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:22px;background:#111827;color:white;font-weight:900;touch-action:none}
+#L,#R{width:66px;height:66px;font-size:27px}#L{left:10px}#R{left:82px}#V{left:154px;width:70px;height:66px;font-size:11px}#D{right:92px;width:70px;height:66px;background:#047857;font-size:11px}#J{right:10px;width:76px;height:76px;background:#b45309;font-size:13px}
 #screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px}.card{width:min(460px,100%);background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950}.card p{line-height:1.45;color:#dbeafe}
 </style></head><body>
 <canvas id="c"></canvas><div id="hud"><span id="level"></span><span id="stat"></span></div>
@@ -26,7 +26,7 @@ const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis",
 const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155"];
 let P,platforms,monsters,items,spikes,pipes,goal,boss,pits;
 
-function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
+function resize(){W=innerWidth;H=C.clientHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
 function hud(){LE.textContent=names[lv]+" · "+(lv+1)+"/10";ST.textContent="🪙 "+coins+"　❤️ "+lives}
 function addPlatform(x,y,w=150,m=0){platforms.push({x,y,w,h:22,m,base:x,v:m?1.15:0,range:70})}
 function build(){
@@ -39,9 +39,9 @@ function build(){
  pits=[[520,130],[1170,130],[1800,150],[2510,160]];
  // Required jumping route across gaps and over obstacles.
  let route=[
- [430,105,130],[555,150,125],[700,120,140],[1015,150,135],[1145,190,125],
- [1285,145,145],[1660,165,135],[1785,205,125],[1930,155,145],[2340,175,135],
- [2470,215,125],[2615,165,145],[3020,180,140],[3160,135,140]
+ [430,100,145],[555,130,145],[700,105,155],[1015,125,150],[1145,150,145],
+ [1285,120,155],[1660,135,150],[1785,160,145],[1930,125,155],[2340,140,150],
+ [2470,165,145],[2615,135,155],[3020,145,150],[3160,115,155]
  ];
  route.forEach((r,i)=>{addPlatform(r[0],floor-r[1]-(lv%2)*5,r[2],lv>=3&&i%4===2);if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30-(lv%2)*5,t:0})});
  // Ground monsters force jumping/combat.
@@ -73,8 +73,7 @@ function bind(id,k){
  e.addEventListener("touchcancel",up,{passive:false});
 }
 bind("#L","l");bind("#R","r");bind("#J","j");bind("#D","d");bind("#V","v");
-addEventListener("pointerup",()=>{I.l=0;I.r=0;I.v=0});
-addEventListener("touchend",()=>{I.l=0;I.r=0;I.v=0},{passive:true});
+addEventListener("blur",()=>{I.l=0;I.r=0;I.j=0;I.d=0;I.v=0});
 
 function enterPipe(){
  if(underground){ // exit upward into later part of level
@@ -87,7 +86,7 @@ function enterPipe(){
 function update(){
  if(I.v){
    if(!lookMode){lookMode=true;lookCam=cam;P.vx=0}
-   if(I.l)lookCam-=8;if(I.r)lookCam+=8;
+   P.vx=0;if(I.l)lookCam-=12;if(I.r)lookCam+=12;
    let mc=Math.max(0,(underground?1250:3550)-W);
    lookCam=Math.max(0,Math.min(lookCam,mc));cam=lookCam;return;
  } else if(lookMode){lookMode=false;cam=Math.max(0,Math.min(P.x-W*.3,Math.max(0,(underground?1250:3550)-W)))}
