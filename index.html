@@ -40,11 +40,11 @@ function build(){
  pits=[[520,130],[1170,130],[1800,150],[2510,160]];
  // Required jumping route across gaps and over obstacles.
  let route=[
- [400,150,155],[565,235,150],[735,330,150],[900,430,160],
- [1070,315,155],[1245,410,150],[1420,505,165],[1600,390,155],
- [1780,285,160],[1955,390,155],[2130,495,165],[2310,375,155],
- [2490,280,160],[2665,390,155],[2840,500,165],[3020,380,155],
- [3190,275,165],[3350,365,150]
+ [430,110,145],[555,195,140],[690,280,145],[825,365,150],
+ [1030,285,150],[1160,375,145],[1295,465,155],[1450,375,150],
+ [1650,285,150],[1780,375,145],[1920,465,155],[2080,370,150],
+ [2310,285,150],[2445,375,145],[2590,465,155],[2760,370,150],
+ [3000,285,155],[3160,375,155]
  ];
  // Hohe Plattformen bleiben hoch; jeder notwendige Höhenunterschied ist trotzdem springbar.
  route.forEach((r,i)=>{addPlatform(r[0],floor-r[1],r[2],lv>=3&&i%5===3);if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30,t:0})});
@@ -53,7 +53,7 @@ function build(){
  // Platform monsters.
  [2,5,8,11].forEach((idx,k)=>{let a=platforms[sections.length+idx];if(a)monsters.push({x:a.x+35,y:a.y-36,w:36,h:36,v:k%2?1:-1,a:a.x,b:a.x+a.w-36,on:1,type:(k+1)%3})});
  // Spikes on ground sections.
- [330,470,880,1010,1490,1660,2170,2320,2860,3040].slice(0,Math.min(10,5+Math.floor(lv/3))).forEach(x=>spikes.push({x,y:floor-20,w:75,h:20}));
+ [330,470,880,1010,1490,1660,2170,2320,2860,3040].slice(0,Math.max(0,Math.min(10,5+Math.floor(lv/3))-2)).forEach(x=>spikes.push({x,y:floor-20,w:75,h:20}));
  // A real down-pipe with an underground room and exit pipe.
  pipes=[{x:1080,y:floor-74,w:66,h:74,id:0,returnX:2060},{x:2380,y:floor-74,w:66,h:74,id:1,returnX:3220}];
  // Untergrund: durchgehender Boden, keine Abgründe, erreichbare Münzen, eigene Gegner und Hindernisse.
