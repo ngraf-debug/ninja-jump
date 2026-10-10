@@ -4,10 +4,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Ninja Jump 4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none}canvas{display:block;width:100vw;height:calc(100vh - 132px)}
+button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none}canvas{display:block;width:100vw;height:100vh}
 #hud{position:fixed;z-index:4;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
-.btn{position:fixed;z-index:8;bottom:max(12px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:22px;background:#111827;color:white;font-weight:900;touch-action:none}
-#L,#R{width:66px;height:66px;font-size:27px}#L{left:10px}#R{left:82px}#V{left:154px;width:70px;height:66px;font-size:11px}#D{right:92px;width:70px;height:66px;background:#047857;font-size:11px}#J{right:10px;width:76px;height:76px;background:#b45309;font-size:13px}
+.btn{position:fixed;z-index:8;bottom:max(18px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
+#L,#R{width:78px;height:78px;font-size:30px}#L{left:14px}#R{left:102px}#V{left:4px;bottom:max(12px,env(safe-area-inset-bottom));width:92px;height:44px;border-radius:24px;font-size:13px;transform:translateY(48px)}#J{right:16px;width:100px;height:100px;background:#b45309dd}#D{right:126px;width:72px;height:72px;background:#047857dd;font-size:12px}
 #screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px}.card{width:min(460px,100%);background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950}.card p{line-height:1.45;color:#dbeafe}
 </style></head><body>
 <canvas id="c"></canvas><div id="hud"><span id="level"></span><span id="stat"></span></div>
@@ -24,26 +24,29 @@ const C=document.querySelector("#c"),G=C.getContext("2d"),S=document.querySelect
 let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0;
 const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg"];
 const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155"];
-let P,platforms,monsters,items,spikes,pipes,goal,boss,pits;
+let P,platforms,monsters,items,spikes,pipes,goal,boss,pits,tunnelCoins,tunnelMonsters,tunnelHazards,pipeTarget=null;
 
-function resize(){W=innerWidth;H=C.clientHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
+function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
 function hud(){LE.textContent=names[lv]+" · "+(lv+1)+"/10";ST.textContent="🪙 "+coins+"　❤️ "+lives}
 function addPlatform(x,y,w=150,m=0){platforms.push({x,y,w,h:22,m,base:x,v:m?1.15:0,range:70})}
 function build(){
  let floor=H-86;underground=false;cam=0;checkpoint=40;
  P={x:40,y:floor-55,w:38,h:50,vx:0,vy:0,on:0,inv:0};
- platforms=[];monsters=[];items=[];spikes=[];pipes=[];pits=[];boss=null;
+ platforms=[];monsters=[];items=[];spikes=[];pipes=[];pits=[];tunnelCoins=[];tunnelMonsters=[];tunnelHazards=[];boss=null;pipeTarget=null;
  // Floor is split into sections, creating real pits.
  let sections=[[0,520],[650,520],[1300,500],[1950,560],[2670,880]];
  sections.forEach(s=>platforms.push({x:s[0],y:floor,w:s[1],h:120}));
  pits=[[520,130],[1170,130],[1800,150],[2510,160]];
  // Required jumping route across gaps and over obstacles.
  let route=[
- [430,100,145],[555,130,145],[700,105,155],[1015,125,150],[1145,150,145],
- [1285,120,155],[1660,135,150],[1785,160,145],[1930,125,155],[2340,140,150],
- [2470,165,145],[2615,135,155],[3020,145,150],[3160,115,155]
+ [430,110,145],[555,195,140],[690,280,145],[825,365,150],
+ [1030,285,150],[1160,375,145],[1295,465,155],[1450,375,150],
+ [1650,285,150],[1780,375,145],[1920,465,155],[2080,370,150],
+ [2310,285,150],[2445,375,145],[2590,465,155],[2760,370,150],
+ [3000,285,155],[3160,375,155]
  ];
- route.forEach((r,i)=>{addPlatform(r[0],floor-r[1]-(lv%2)*5,r[2],lv>=3&&i%4===2);if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30-(lv%2)*5,t:0})});
+ // Hohe Plattformen bleiben hoch; jeder notwendige Höhenunterschied ist trotzdem springbar.
+ route.forEach((r,i)=>{addPlatform(r[0],floor-r[1],r[2],lv>=3&&i%5===3);if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30,t:0})});
  // Ground monsters force jumping/combat.
  [280,800,1430,2100,2800].forEach((x,i)=>monsters.push({x,y:floor-36,w:36,h:36,v:i%2?1.05:-1.05,a:x-70,b:x+90,on:1,type:(i+lv)%3}));
  // Platform monsters.
@@ -51,45 +54,64 @@ function build(){
  // Spikes on ground sections.
  [350,900,1510,2190,2880].slice(0,3+Math.floor(lv/3)).forEach(x=>spikes.push({x,y:floor-20,w:75,h:20}));
  // A real down-pipe with an underground room and exit pipe.
- pipes=[{x:1080,y:floor-74,w:66,h:74,kind:"down"},{x:2380,y:floor-74,w:66,h:74,kind:"down"}];
+ pipes=[{x:1080,y:floor-74,w:66,h:74,id:0,returnX:1660},{x:2380,y:floor-74,w:66,h:74,id:1,returnX:3000}];
+ tunnelCoins=[
+ {x:150,y:H-115,t:0},{x:260,y:H-210,t:0},{x:385,y:H-260,t:0},
+ {x:520,y:H-220,t:0},{x:690,y:H-280,t:0},{x:835,y:H-230,t:0},
+ {x:995,y:H-270,t:0},{x:1080,y:H-115,t:0}
+ ];
+ tunnelMonsters=[
+ {x:360,y:H-116,w:36,h:36,v:1,a:330,b:470,on:1,type:0},
+ {x:720,y:H-116,w:36,h:36,v:-1.15,a:650,b:810,on:1,type:1},
+ {x:930,y:H-116,w:36,h:36,v:1.1,a:880,b:1040,on:1,type:2}
+ ];
+ tunnelHazards=[{x:545,y:H-100,w:54,h:20},{x:850,y:H-100,w:54,h:20}];
  goal={x:3400,y:floor-115,w:55,h:115};
  if(lv===2||lv===5||lv===9)boss={x:3180,y:floor-86,w:86,h:86,v:1.45,a:3070,b:3340,hp:lv===9?6:3,on:1};
  hud()
 }
 function hit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
-function respawn(){if(P.inv)return;lives--;hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
+function respawn(){if(P.inv)return;lives--;hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}if(underground){P.x=90;P.y=H-180;P.vx=P.vy=0;P.inv=100;return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
 function end(title,button){run=0;S.style.display="flex";S.innerHTML='<div class="card"><h1>'+title+'</h1><p>Münzen: '+coins+'</p><button id="go">'+button+'</button></div>';document.querySelector("#go").onclick=start}
 function start(){if(lives<=0||lv>=10){lv=0;coins=0;lives=5}S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}document.querySelector("#go").onclick=start;
 function bind(id,k){
- let e=document.querySelector(id);
- const down=q=>{q.preventDefault();q.stopPropagation();I[k]=1;try{if(q.pointerId!=null)e.setPointerCapture(q.pointerId)}catch(_){}};
- const up=q=>{if(q){q.preventDefault();q.stopPropagation()}I[k]=0};
+ const e=document.querySelector(id);
+ const down=q=>{q.preventDefault();q.stopPropagation();I[k]=1;try{e.setPointerCapture(q.pointerId)}catch(_){}};
+ const up=q=>{q.preventDefault();q.stopPropagation();I[k]=0};
  e.addEventListener("pointerdown",down,{passive:false});
  e.addEventListener("pointerup",up,{passive:false});
  e.addEventListener("pointercancel",up,{passive:false});
- e.addEventListener("lostpointercapture",up,{passive:false});
- e.addEventListener("touchstart",q=>{q.preventDefault();I[k]=1},{passive:false});
- e.addEventListener("touchend",up,{passive:false});
- e.addEventListener("touchcancel",up,{passive:false});
+ e.addEventListener("lostpointercapture",()=>I[k]=0,{passive:false});
 }
 bind("#L","l");bind("#R","r");bind("#J","j");bind("#D","d");bind("#V","v");
-addEventListener("blur",()=>{I.l=0;I.r=0;I.j=0;I.d=0;I.v=0});
+// Wichtig auf dem iPhone: mehrere Finger bleiben unabhängig aktiv.
+// Deshalb gibt es absichtlich KEIN globales pointerup, das alle Tasten zurücksetzt.
+
 
 function enterPipe(){
- if(underground){ // exit upward into later part of level
-   underground=false;P.x=2460;P.y=H-240;P.vy=-6;checkpoint=2460;return;
+ if(underground){
+   // Nur an der grünen Ausgangsröhre kann man wieder hinaus.
+   if(P.x+P.w>1085 && P.x<1215 && P.y+P.h>H-175){
+     underground=false;P.x=pipeTarget?.returnX||1240;P.y=H-240;P.vy=-6;checkpoint=P.x;pipeTarget=null;
+   }
+   return;
  }
- for(const t of pipes)if(Math.abs(P.x+P.w/2-(t.x+t.w/2))<48&&P.y+P.h>=t.y-6){
-   underground=true;P.x=150;P.y=H-210;P.vx=P.vy=0;return;
+ for(const t of pipes){
+   if(Math.abs(P.x+P.w/2-(t.x+t.w/2))<48&&P.y+P.h>=t.y-8){
+     pipeTarget=t;underground=true;P.x=80;P.y=H-210;P.vx=P.vy=0;return;
+   }
  }
 }
+
 function update(){
  if(I.v){
    if(!lookMode){lookMode=true;lookCam=cam;P.vx=0}
-   P.vx=0;if(I.l)lookCam-=12;if(I.r)lookCam+=12;
+   if(I.l)lookCam-=10;if(I.r)lookCam+=10;
    let mc=Math.max(0,(underground?1250:3550)-W);
-   lookCam=Math.max(0,Math.min(lookCam,mc));cam=lookCam;return;
- } else if(lookMode){lookMode=false;cam=Math.max(0,Math.min(P.x-W*.3,Math.max(0,(underground?1250:3550)-W)))}
+   lookCam=Math.max(0,Math.min(lookCam,mc));cam=lookCam;
+   // Im SCHAU-Modus steuern die Pfeile ausschließlich die Kamera.
+   return;
+ } else if(lookMode){lookMode=false;I.l=0;I.r=0;cam=Math.max(0,Math.min(P.x-W*.3,Math.max(0,(underground?1250:3550)-W)))}
  if(I.l)P.vx=Math.max(-5.8,P.vx-.72);if(I.r)P.vx=Math.min(5.8,P.vx+.72);if(!I.l&&!I.r)P.vx*=.78;
  if(I.j&&P.on){P.vy=-13.6;P.on=0}I.j=0;if(I.d){enterPipe();I.d=0}
  P.vy=Math.min(15,P.vy+.64);P.x=Math.max(0,P.x+P.vx);P.y+=P.vy;P.on=0;
@@ -104,7 +126,12 @@ function update(){
    if(P.x>1900&&checkpoint<1900)checkpoint=1950;
    if(hit(P,goal)&&(!boss||!boss.on)){if(lv<9){lv++;build()}else{lv=10;end("🏆 NINJA-MEISTER!","NOCHMAL");return}}
    cam=Math.max(0,Math.min(P.x-W*.3,3550-W));
- }else cam=Math.max(0,Math.min(P.x-W*.3,1250-W));
+ }else{
+   for(const o of tunnelCoins)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<1500){o.t=1;coins++;hud()}}
+   for(const m of tunnelMonsters)if(m.on){m.x+=m.v;if(m.x<m.a||m.x>m.b)m.v=-m.v;if(hit(P,m)&&!P.inv){if(P.vy>1&&P.y+P.h-m.y<29){m.on=0;P.vy=-9;coins+=3;hud()}else{respawn();return}}}
+   for(const h of tunnelHazards)if(hit(P,h)&&!P.inv){respawn();return}
+   cam=Math.max(0,Math.min(P.x-W*.3,1250-W));
+ }
 }
 function undergroundPlatforms(){let y=H-80;return[{x:0,y,w:1300,h:100},{x:170,y:y-95,w:145,h:22},{x:330,y:y-145,w:145,h:22},{x:490,y:y-105,w:145,h:22},{x:650,y:y-165,w:145,h:22},{x:810,y:y-115,w:145,h:22},{x:970,y:y-155,w:180,h:22}]}
 function ninja(){G.save();if(P.inv&&Math.floor(P.inv/5)%2)G.globalAlpha=.3;G.fillStyle="#0f172a";G.fillRect(P.x+4,P.y+2,30,48);G.fillStyle="#d6a57b";G.fillRect(P.x+9,P.y+12,20,8);G.fillStyle="#fff";G.fillRect(P.x+11,P.y+14,5,3);G.fillRect(P.x+24,P.y+14,5,3);G.fillStyle="#dc2626";G.fillRect(P.x+4,P.y+29,30,5);G.restore()}
@@ -113,9 +140,12 @@ function draw(){
  let active=underground?undergroundPlatforms():platforms;
  for(const a of active){G.fillStyle=underground?"#51435c":"#35654a";G.fillRect(a.x,a.y,a.w,a.h);G.fillStyle="#ffffff30";G.fillRect(a.x,a.y,a.w,6)}
  if(underground){
+   G.fillStyle="#166534";G.fillRect(35,H-154,70,74);G.fillRect(28,H-154,84,18);
    G.fillStyle="#22c55e";G.fillRect(1120,H-154,70,74);G.fillRect(1113,H-154,84,18);
-   for(let i=0;i<8;i++){G.fillStyle="#facc15";G.beginPath();G.arc(230+i*110,H-300-(i%2)*60,9,0,7);G.fill()}
-   G.fillStyle="#fff";G.font="bold 18px sans-serif";G.fillText("Geheimtunnel → bis zur grünen Ausgangsröhre",90,70);
+   for(const o of tunnelCoins)if(!o.t){G.fillStyle="#facc15";G.beginPath();G.arc(o.x,o.y,10,0,7);G.fill()}
+   for(const h of tunnelHazards){G.fillStyle="#d1d5db";for(let z=0;z<h.w;z+=14){G.beginPath();G.moveTo(h.x+z,h.y+h.h);G.lineTo(h.x+z+7,h.y);G.lineTo(h.x+z+14,h.y+h.h);G.fill()}}
+   for(const m of tunnelMonsters)if(m.on){G.font="31px sans-serif";G.fillText(["🟣","🕷️","🐛"][m.type],m.x,m.y+31)}
+   G.fillStyle="#fff";G.font="bold 18px sans-serif";G.fillText("Geheimtunnel: Münzen + Tunnelmonster → Ausgang",90,70);
  }else{
    for(const t of pipes){G.fillStyle="#15803d";G.fillRect(t.x,t.y,t.w,t.h);G.fillStyle="#22c55e";G.fillRect(t.x-7,t.y,t.w+14,18)}
    for(const s of spikes){G.fillStyle="#d1d5db";for(let z=0;z<s.w;z+=15){G.beginPath();G.moveTo(s.x+z,s.y+s.h);G.lineTo(s.x+z+7.5,s.y);G.lineTo(s.x+z+15,s.y+s.h);G.fill()}}
