@@ -7,12 +7,12 @@
 button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none}canvas{display:block;width:100vw;height:100vh}
 #hud{position:fixed;z-index:4;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
 .btn{position:fixed;z-index:8;bottom:max(18px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
-#L,#R{width:78px;height:78px;font-size:30px}#L{left:14px}#R{left:102px}#V{left:4px;bottom:max(12px,env(safe-area-inset-bottom));width:92px;height:44px;border-radius:24px;font-size:13px;transform:translateY(48px)}#J{right:16px;width:100px;height:100px;background:#b45309dd}#D{right:126px;width:72px;height:72px;background:#047857dd;font-size:12px}
+#L,#R{width:64px;height:64px;font-size:25px}#L{left:10px}#R{left:82px}#V{left:154px;width:72px;height:64px;border-radius:22px;font-size:11px}#J{right:10px;width:78px;height:78px;background:#b45309dd;font-size:14px}#D{right:96px;width:68px;height:64px;background:#047857dd;font-size:11px}
 #screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px}.card{width:min(460px,100%);background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950}.card p{line-height:1.45;color:#dbeafe}
 </style></head><body>
 <canvas id="c"></canvas><div id="hud"><span id="level"></span><span id="stat"></span></div>
 <button class="btn" id="L">◀</button><button class="btn" id="R">▶</button><button class="btn" id="V">SCHAU<br>👀</button><button class="btn" id="D">RÖHRE<br>▼</button><button class="btn" id="J">SPRING</button>
-<div id="screen"><div class="card"><h1>🥷 Ninja Jump 4</h1><p>10 geprüfte Hindernis-Level mit machbaren Sprüngen, Abgründen, Stacheln, Bodenmonstern, Plattformen, unterirdischen Röhren und besiegbaren Bossen.</p><button id="go">SPIEL STARTEN</button><p>Springe auf Monster und Bosse. Halte SCHAU 👀 gedrückt und benutze ◀ ▶, um vorauszuschauen, ohne den Ninja zu bewegen.</p></div></div>
+<div id="screen"><div class="card"><h1>🥷 Ninja Jump 4</h1><p>20 Hindernis-Level mit machbaren Sprüngen, Abgründen, Stacheln, Bodenmonstern, Plattformen, unterirdischen Röhren und besiegbaren Bossen.</p><button id="go">SPIEL STARTEN</button><p>Springe auf Monster und Bosse. Halte SCHAU 👀 gedrückt und benutze ◀ ▶, um vorauszuschauen, ohne den Ninja zu bewegen.</p></div></div>
 <script>
 (()=>{"use strict";
 document.addEventListener("contextmenu",e=>e.preventDefault(),{capture:true});
@@ -22,12 +22,13 @@ document.addEventListener("gesturestart",e=>e.preventDefault(),{passive:false});
 document.addEventListener("touchmove",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false});
 const C=document.querySelector("#c"),G=C.getContext("2d"),S=document.querySelector("#screen"),LE=document.querySelector("#level"),ST=document.querySelector("#stat");
 let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0;
-const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg"];
-const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155"];
+const TOTAL=20;
+const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg","🌧️ Sturmwald","🦂 Canyon","🧊 Gletscher","🌌 Sternennacht","🌋 Lavahöhle","🌪️ Wolkensturm","💎 Kristallhöhle","⛩️ Ninja-Tempel","👺 Dämonenpfad","👑 Kaiserburg"];
+const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155","#475569","#c08457","#dbeafe","#1e1b4b","#991b1b","#64748b","#312e81","#7c2d12","#450a0a","#1f2937"];
 let P,platforms,monsters,items,spikes,pipes,goal,boss,pits,tunnelCoins,tunnelMonsters,tunnelObstacles,pipeTarget=null;
 
 function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
-function hud(){LE.textContent=names[lv]+" · "+(lv+1)+"/10";ST.textContent="🪙 "+coins+"　❤️ "+lives}
+function hud(){LE.textContent=names[lv]+" · "+(lv+1)+"/"+TOTAL;ST.textContent="🪙 "+coins+"　❤️ "+lives}
 function addPlatform(x,y,w=150,m=0){platforms.push({x,y,w,h:22,m,base:x,v:m?1.15:0,range:70})}
 function build(){
  let floor=H-86;underground=false;cam=0;checkpoint=40;
@@ -48,11 +49,11 @@ function build(){
  // Hohe Plattformen bleiben hoch; jeder notwendige Höhenunterschied ist trotzdem springbar.
  route.forEach((r,i)=>{addPlatform(r[0],floor-r[1],r[2],lv>=3&&i%5===3);if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30,t:0})});
  // Ground monsters force jumping/combat.
- [280,800,1430,2100,2800].forEach((x,i)=>monsters.push({x,y:floor-36,w:36,h:36,v:i%2?1.05:-1.05,a:x-70,b:x+90,on:1,type:(i+lv)%3}));
+ [180,420,800,1030,1430,1690,2100,2350,2800,3060].forEach((x,i)=>monsters.push({x,y:floor-36,w:36,h:36,v:i%2?1.05:-1.05,a:x-70,b:x+90,on:1,type:(i+lv)%3}));
  // Platform monsters.
  [2,5,8,11].forEach((idx,k)=>{let a=platforms[sections.length+idx];if(a)monsters.push({x:a.x+35,y:a.y-36,w:36,h:36,v:k%2?1:-1,a:a.x,b:a.x+a.w-36,on:1,type:(k+1)%3})});
  // Spikes on ground sections.
- [350,900,1510,2190,2880].slice(0,3+Math.floor(lv/3)).forEach(x=>spikes.push({x,y:floor-20,w:75,h:20}));
+ [330,470,880,1010,1490,1660,2170,2320,2860,3040].slice(0,Math.min(10,5+Math.floor(lv/3))).forEach(x=>spikes.push({x,y:floor-20,w:75,h:20}));
  // A real down-pipe with an underground room and exit pipe.
  pipes=[{x:1080,y:floor-74,w:66,h:74,id:0,returnX:2060},{x:2380,y:floor-74,w:66,h:74,id:1,returnX:3220}];
  // Untergrund: durchgehender Boden, keine Abgründe, erreichbare Münzen, eigene Gegner und Hindernisse.
@@ -60,13 +61,13 @@ function build(){
  tunnelMonsters=[{x:430,y:H-116,w:38,h:36,v:1,a:390,b:560,on:1},{x:900,y:H-116,w:38,h:36,v:-1.1,a:850,b:1030,on:1},{x:1370,y:H-116,w:38,h:36,v:1.15,a:1320,b:1510,on:1}];
  tunnelObstacles=[{x:610,y:H-132,w:55,h:52},{x:1080,y:H-152,w:62,h:72},{x:1530,y:H-142,w:58,h:62}];
  goal={x:3400,y:floor-115,w:55,h:115};
- if(lv===2||lv===5||lv===9)boss={x:3180,y:floor-86,w:86,h:86,v:1.45,a:3070,b:3340,hp:lv===9?6:3,on:1};
+ if(lv===2||lv===5||lv===9||lv===12||lv===15||lv===19)boss={x:3180,y:floor-86,w:86,h:86,v:1.45,a:3070,b:3340,hp:lv===19?8:(lv>=9?5:3),on:1};
  hud()
 }
 function hit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function respawn(){if(P.inv)return;lives--;hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
 function end(title,button){run=0;S.style.display="flex";S.innerHTML='<div class="card"><h1>'+title+'</h1><p>Münzen: '+coins+'</p><button id="go">'+button+'</button></div>';document.querySelector("#go").onclick=start}
-function start(){if(lives<=0||lv>=10){lv=0;coins=0;lives=5}S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}document.querySelector("#go").onclick=start;
+function start(){if(lives<=0||lv>=TOTAL){lv=0;coins=0;lives=5}S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}document.querySelector("#go").onclick=start;
 function bind(id,k){
  const e=document.querySelector(id);
  const down=q=>{q.preventDefault();q.stopPropagation();I[k]=1;try{e.setPointerCapture(q.pointerId)}catch(_){}};
@@ -117,7 +118,7 @@ function update(){
    for(const o of items)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<950){o.t=1;coins++;hud()}}
    if(boss&&boss.on){boss.x+=boss.v;if(boss.x<boss.a||boss.x>boss.b)boss.v=-boss.v;if(hit(P,boss)&&!P.inv){if(P.vy>1&&P.y+P.h-boss.y<31){boss.hp--;P.vy=-11;P.inv=32;if(!boss.hp){boss.on=0;coins+=15;hud()}}else respawn()}}
    if(P.x>1900&&checkpoint<1900)checkpoint=1950;
-   if(hit(P,goal)&&(!boss||!boss.on)){if(lv<9){lv++;build()}else{lv=10;end("🏆 NINJA-MEISTER!","NOCHMAL");return}}
+   if(hit(P,goal)&&(!boss||!boss.on)){if(lv<TOTAL-1){lv++;build()}else{lv=TOTAL;end("🏆 NINJA-MEISTER!","NOCHMAL");return}}
    cam=Math.max(0,Math.min(P.x-W*.3,3550-W));
  }else{
    for(const o of tunnelCoins)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<1500){o.t=1;coins++;hud()}}
