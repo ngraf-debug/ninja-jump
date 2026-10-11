@@ -23,7 +23,7 @@ document.addEventListener("touchstart",e=>{if(e.target.closest?.(".btn")){e.prev
 document.addEventListener("touchmove",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 document.addEventListener("touchend",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 const C=document.querySelector("#c"),G=C.getContext("2d"),S=document.querySelector("#screen"),LE=document.querySelector("#level"),ST=document.querySelector("#stat");
-let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0;
+let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0,startTime=0,bossKills=0,shield=0,floatPower=0,jumpPower=0;
 const TOTAL=20;
 const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg","🌧️ Sturmwald","🦂 Canyon","🧊 Gletscher","🌌 Sternennacht","🌋 Lavahöhle","🌪️ Wolkensturm","💎 Kristallhöhle","⛩️ Ninja-Tempel","👺 Dämonenpfad","👑 Kaiserburg"];
 const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155","#475569","#c08457","#dbeafe","#1e1b4b","#991b1b","#64748b","#312e81","#7c2d12","#450a0a","#1f2937"];
@@ -67,9 +67,11 @@ function build(){
  hud()
 }
 function hit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
-function respawn(){if(P.inv)return;lives--;hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
-function end(title,button){run=0;S.style.display="flex";S.innerHTML='<div class="card"><h1>'+title+'</h1><p>Münzen: '+coins+'</p><button id="go">'+button+'</button></div>';document.querySelector("#go").onclick=start}
-function start(){if(lives<=0||lv>=TOTAL){lv=0;coins=0;lives=5}S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}document.querySelector("#go").onclick=start;
+function respawn(){if(P.inv)return;if(shield){shield=0;P.inv=80;hud();return}lives--;hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
+function records(sec){let r={time:0,coins:0,levels:0};try{r=JSON.parse(localStorage.ninjaJumpRecords||"null")||r}catch(_){};if(sec&&(!r.time||sec<r.time))r.time=sec;if(coins>r.coins)r.coins=coins;if(Math.min(lv+1,TOTAL)>r.levels)r.levels=Math.min(lv+1,TOTAL);try{localStorage.ninjaJumpRecords=JSON.stringify(r)}catch(_){}return r}
+function end(title,button){run=0;let sec=Math.max(1,Math.floor((performance.now()-startTime)/1000)),r=records(title.includes("NINJA-MEISTER")?sec:0);S.style.display="flex";S.innerHTML='<div class="card"><h1>'+title+'</h1><p>⏱️ Zeit: '+Math.floor(sec/60)+'m '+(sec%60)+'s<br>🪙 Münzen: '+coins+'<br>🏁 Level geschafft: '+Math.min(lv+1,TOTAL)+'/'+TOTAL+'<br>👹 Bosse besiegt: '+bossKills+'</p><p><b>🏆 REKORDE</b><br>Beste Zeit: '+(r.time?Math.floor(r.time/60)+'m '+(r.time%60)+'s':'—')+'<br>Münzrekord: '+r.coins+'<br>Höchstes Level: '+r.levels+'/'+TOTAL+'</p><button id="go">'+button+'</button></div>';document.querySelector("#go").onclick=start}
+function start(){if(lives<=0||lv>=TOTAL){lv=0;coins=0;lives=5;bossKills=0}shield=0;floatPower=0;jumpPower=0;startTime=performance.now();S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}document.querySelector("#go").onclick=start;
+function levelChest(){run=0;let finished=lv+1;records(0);S.style.display="flex";S.innerHTML='<div class="card"><h1>🎉 LEVEL '+finished+' GESCHAFFT!</h1><p>Herzlichen Glückwunsch! 🥷<br>Tippe auf die Schatztruhe für eine kleine Superkraft.</p><button id="chest" style="font-size:52px">🎁</button></div>';document.querySelector("#chest").onclick=()=>{let powers=[()=>{lives+=1;return"❤️ +1 Leben"},()=>{lives+=2;return"❤️❤️ +2 Leben"},()=>{lives+=3;return"❤️❤️❤️ +3 Leben"},()=>{coins+=5;return"🪙 +5 Münzen"},()=>{shield=1;return"🛡️ Einmaliger Schutzschild"},()=>{floatPower=360;return"🪽 Kurz schweben"},()=>{jumpPower=600;return"⚡ Kurz höher springen"}];let msg=powers[Math.floor(Math.random()*powers.length)]();hud();S.innerHTML='<div class="card"><h1>✨ '+msg+'</h1><p>Deine Belohnung aus der Schatztruhe!</p><button id="next">'+(finished<TOTAL?'WEITER ZU LEVEL '+(finished+1):'ERGEBNIS ANZEIGEN')+'</button></div>';document.querySelector("#next").onclick=()=>{if(finished<TOTAL){lv++;S.style.display="none";build();run=1;last=performance.now();requestAnimationFrame(loop)}else{lv=TOTAL;end("🏆 NINJA-MEISTER!","NOCHMAL")}}}}
 function bind(id,k){
  const e=document.querySelector(id);
  const down=q=>{q.preventDefault();q.stopPropagation();I[k]=1;try{e.setPointerCapture(q.pointerId)}catch(_){}};
@@ -109,8 +111,8 @@ function update(){
    return;
  } else if(lookMode){lookMode=false;I.l=0;I.r=0;cam=Math.max(0,Math.min(P.x-W*.3,Math.max(0,(underground?1850:3550)-W)))}
  if(I.l)P.vx=Math.max(-5.8,P.vx-.72);if(I.r)P.vx=Math.min(5.8,P.vx+.72);if(!I.l&&!I.r)P.vx*=.78;
- if(I.j&&P.on){P.vy=-13.6;P.on=0}I.j=0;if(I.d){enterPipe();I.d=0}
- P.vy=Math.min(15,P.vy+.64);P.x=Math.max(0,P.x+P.vx);P.y+=P.vy;P.on=0;
+ if(I.j&&P.on){P.vy=jumpPower?-15.2:-13.6;P.on=0}I.j=0;if(I.d){enterPipe();I.d=0}
+ P.vy=Math.min(15,P.vy+(floatPower?.34:.64));if(floatPower>0)floatPower--;if(jumpPower>0)jumpPower--;P.x=Math.max(0,P.x+P.vx);P.y+=P.vy;P.on=0;
  let active=underground?undergroundPlatforms():platforms;
  for(const a of active){if(a.m){a.x+=a.v;if(Math.abs(a.x-a.base)>a.range)a.v=-a.v}if(P.vy>=0&&P.x+P.w>a.x&&P.x<a.x+a.w&&P.y+P.h>=a.y&&P.y+P.h-P.vy<=a.y+8){P.y=a.y-P.h;P.vy=0;P.on=1;if(a.m)P.x+=a.v}}
  if(P.y>H+70){respawn();return}if(P.inv)P.inv--;
@@ -118,9 +120,9 @@ function update(){
    for(const s of spikes)if(hit(P,s)&&!P.inv)respawn();
    for(const m of monsters)if(m.on){m.x+=m.v;if(m.x<m.a||m.x>m.b)m.v=-m.v;if(hit(P,m)&&!P.inv){if(P.vy>1&&P.y+P.h-m.y<27){m.on=0;P.vy=-9;coins+=2;hud()}else respawn()}}
    for(const o of items)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<950){o.t=1;coins++;hud()}}
-   if(boss&&boss.on){boss.x+=boss.v;if(boss.x<boss.a||boss.x>boss.b)boss.v=-boss.v;if(hit(P,boss)&&!P.inv){if(P.vy>1&&P.y+P.h-boss.y<31){boss.hp--;P.vy=-11;P.inv=32;if(!boss.hp){boss.on=0;coins+=15;hud()}}else respawn()}}
+   if(boss&&boss.on){boss.x+=boss.v;if(boss.x<boss.a||boss.x>boss.b)boss.v=-boss.v;if(hit(P,boss)&&!P.inv){if(P.vy>1&&P.y+P.h-boss.y<31){boss.hp--;P.vy=-11;P.inv=32;if(!boss.hp){boss.on=0;coins+=15;lives++;bossKills++;hud()}}else respawn()}}
    if(P.x>1900&&checkpoint<1900)checkpoint=1950;
-   if(hit(P,goal)&&(!boss||!boss.on)){if(lv<TOTAL-1){lv++;build()}else{lv=TOTAL;end("🏆 NINJA-MEISTER!","NOCHMAL");return}}
+   if(hit(P,goal)&&(!boss||!boss.on)){levelChest();return}
    cam=Math.max(0,Math.min(P.x-W*.3,3550-W));
  }else{
    for(const o of tunnelCoins)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<1500){o.t=1;coins++;hud()}}
