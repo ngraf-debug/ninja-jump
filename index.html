@@ -4,10 +4,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Ninja Jump 4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:100vh}
+button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:calc(100vh - 86px)}body::after{content:"";position:fixed;z-index:6;left:0;right:0;bottom:0;height:86px;background:#07111d;border-top:1px solid #ffffff22;pointer-events:none}
 #hud{position:fixed;z-index:4;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
-.btn{position:fixed;z-index:8;bottom:max(18px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
-#L,#R{width:64px;height:64px;font-size:25px}#L{left:10px}#R{left:82px}#V{left:154px;width:72px;height:64px;border-radius:22px;font-size:11px}#J{right:10px;width:78px;height:78px;background:#b45309dd;font-size:14px}#D{right:96px;width:68px;height:64px;background:#047857dd;font-size:11px}
+.btn{position:fixed;z-index:8;bottom:max(7px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
+#L,#R{width:56px;height:56px;font-size:22px}#L{left:8px}#R{left:70px}#V{left:132px;width:66px;height:56px;border-radius:19px;font-size:10px}#J{right:8px;width:66px;height:66px;background:#b45309dd;font-size:12px}#D{right:80px;width:62px;height:56px;background:#047857dd;font-size:10px}
 #screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px}.card{width:min(460px,100%);max-height:calc(100vh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950}.card p{line-height:1.45;color:#dbeafe}.menuBtns{display:grid;gap:10px}.small{font-size:14px!important;padding:12px!important}.shopItem{margin:9px 0;padding:10px;border:1px solid #ffffff33;border-radius:14px;background:#0b1220}.shopItem b{display:block}.good{color:#86efac}.bad{color:#fca5a5}
  #ingameShop{position:fixed;z-index:9;top:max(48px,env(safe-area-inset-top));right:10px;padding:8px 11px;border:1px solid #ffffff88;border-radius:14px;background:#111827dd;color:#fff;font-weight:900;font-size:12px;display:none}</style></head><body>
 <canvas id="c"></canvas><button id="ingameShop">🛒 SHOP</button><div id="hud"><span id="level"></span><span id="stat"></span></div>
@@ -45,7 +45,7 @@ function armorHit(dmg){let a=suit(),d=profile.dur[a.id]??a.max;if(d>0){d=Math.ma
 function hurt(dmg=1){if(P.inv)return;if(shield){shield=0;P.inv=80;hud();return}if(armorHit(dmg))return;for(let i=0;i<dmg;i++){lives--;if(lives<=0)break}hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
 
 
-function resize(){W=innerWidth;H=innerHeight;D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
+function resize(){W=innerWidth;H=Math.max(300,innerHeight-86);D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
 function hud(){let a=suit(),d=profile.dur[a.id]??a.max;LE.textContent=names[lv]+" · "+(lv+1)+"/"+TOTAL;ST.textContent="🪙 "+coins+"　❤️ "+lives+"　🛡️ "+d}
 function addPlatform(x,y,w=150,m=0){
  // Spätere Level: bewegliche Plattformen werden etwas schneller, bleiben aber erreichbar.
@@ -198,7 +198,7 @@ function draw(){
    for(const t of pipes){G.fillStyle="#15803d";G.fillRect(t.x,t.y,t.w,t.h);G.fillStyle="#22c55e";G.fillRect(t.x-7,t.y,t.w+14,18)}
    for(const s of spikes){G.fillStyle="#d1d5db";for(let z=0;z<s.w;z+=15){G.beginPath();G.moveTo(s.x+z,s.y+s.h);G.lineTo(s.x+z+7.5,s.y);G.lineTo(s.x+z+15,s.y+s.h);G.fill()}}
    for(const o of items)if(!o.t){G.fillStyle="#facc15";G.beginPath();G.arc(o.x,o.y,10,0,7);G.fill()}
-   for(const m of monsters)if(m.on){G.font="31px sans-serif";G.fillText(["👾","🦇","👹"][m.type],m.x,m.y+31);drawHearts(m.x,m.y-8,m.hp||1,"#111827")}for(const e of enemyHelpers)if(e.on){G.font="29px sans-serif";G.fillText(e.emoji,e.x,e.y+29);drawHearts(e.x,e.y-8,e.hp,"#111827")}for(const h of helpers){if(h.on){G.font="28px sans-serif";G.fillText(h.emoji,h.x,h.y+28);drawHearts(h.x,h.y-8,h.hp,"#38bdf8")}else{G.font="20px sans-serif";G.fillText("💤",P.x-55,P.y-12)}}
+   for(const m of monsters)if(m.on){G.font="31px sans-serif";G.fillText(["👾","🦇","👹"][m.type],m.x,m.y+31);drawHearts(m.x,m.y-8,m.hp||1,"#111827")}for(const e of enemyHelpers)if(e.on){G.font="29px sans-serif";G.fillText(e.emoji,e.x,e.y+29);drawHearts(e.x,e.y-8,e.hp,"#111827")}for(const h of helpers){if(h.on){G.font="28px sans-serif";G.fillText(h.emoji,h.x,h.y+28);drawHearts(h.x,h.y-8,h.hp,"#38bdf8")}}
    if(boss&&boss.on){G.font="55px sans-serif";G.fillText("👹",boss.x+10,boss.y+62);G.fillStyle="#fff";G.font="bold 14px sans-serif";G.fillText("BOSS ❤️ "+boss.hp,boss.x,boss.y-8)}
    G.fillStyle="#eee";G.fillRect(goal.x,goal.y,7,goal.h);G.fillStyle="#fbbf24";G.fillRect(goal.x+7,goal.y,48,38);
  }
