@@ -4,11 +4,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Ninja Jump 4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:calc(100vh - 86px)}body::after{content:"";position:fixed;z-index:6;left:0;right:0;bottom:0;height:86px;background:#07111d;border-top:1px solid #ffffff22;pointer-events:none}
-#hud{position:fixed;z-index:4;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
+button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:calc(100dvh - 86px)}body::after{content:"";position:fixed;z-index:6;left:0;right:0;bottom:0;height:86px;background:#07111d;border-top:1px solid #ffffff22;pointer-events:none}
+#hud{position:fixed;z-index:7;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
 .btn{position:fixed;z-index:8;bottom:max(7px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
 #L,#R{width:56px;height:56px;font-size:22px}#L{left:8px}#R{left:70px}#V{left:132px;width:66px;height:56px;border-radius:19px;font-size:10px}#J{right:8px;width:66px;height:66px;background:#b45309dd;font-size:12px}#D{right:80px;width:62px;height:56px;background:#047857dd;font-size:10px}
-#screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px}.card{width:min(460px,100%);max-height:calc(100vh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950}.card p{line-height:1.45;color:#dbeafe}.menuBtns{display:grid;gap:10px}.small{font-size:14px!important;padding:12px!important}.shopItem{margin:9px 0;padding:10px;border:1px solid #ffffff33;border-radius:14px;background:#0b1220}.shopItem b{display:block}.good{color:#86efac}.bad{color:#fca5a5}
+#screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px;touch-action:pan-y}.card{width:min(460px,100%);max-height:calc(100dvh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950;touch-action:manipulation}.card p{line-height:1.45;color:#dbeafe}.menuBtns{display:grid;gap:10px}.small{font-size:14px!important;padding:12px!important}.shopItem{margin:9px 0;padding:10px;border:1px solid #ffffff33;border-radius:14px;background:#0b1220}.shopItem b{display:block}.good{color:#86efac}.bad{color:#fca5a5}
  #ingameShop{position:fixed;z-index:9;top:max(48px,env(safe-area-inset-top));right:10px;padding:8px 11px;border:1px solid #ffffff88;border-radius:14px;background:#111827dd;color:#fff;font-weight:900;font-size:12px;display:none}</style></head><body>
 <canvas id="c"></canvas><button id="ingameShop">🛒 SHOP</button><div id="hud"><span id="level"></span><span id="stat"></span></div>
 <button class="btn" id="L" oncontextmenu="return false" onselectstart="return false">◀</button><button class="btn" id="R" oncontextmenu="return false" onselectstart="return false">▶</button><button class="btn" id="V" oncontextmenu="return false" onselectstart="return false">SCHAU<br>👀</button><button class="btn" id="D" oncontextmenu="return false" onselectstart="return false">RÖHRE<br>▼</button><button class="btn" id="J" oncontextmenu="return false" onselectstart="return false">SPRING</button>
@@ -23,7 +23,7 @@ document.addEventListener("touchstart",e=>{if(e.target.closest?.(".btn")){e.prev
 document.addEventListener("touchmove",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 document.addEventListener("touchend",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 const C=document.querySelector("#c"),G=C.getContext("2d"),S=document.querySelector("#screen"),LE=document.querySelector("#level"),ST=document.querySelector("#stat"),IGS=document.querySelector("#ingameShop");
-let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0,startTime=0,bossKills=0,shield=0,floatPower=0,jumpPower=0,helpers=[],enemyHelpers=[];
+let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0,startTime=0,bossKills=0,shield=0,floatPower=0,jumpPower=0,helpers=[],enemyHelpers=[],shopFromGame=false;
 const TOTAL=20;
 const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg","🌧️ Sturmwald","🦂 Canyon","🧊 Gletscher","🌌 Sternennacht","🌋 Lavahöhle","🌪️ Wolkensturm","💎 Kristallhöhle","⛩️ Ninja-Tempel","👺 Dämonenpfad","👑 Kaiserburg"];
 const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155","#475569","#c08457","#dbeafe","#1e1b4b","#991b1b","#64748b","#312e81","#7c2d12","#450a0a","#1f2937"];
@@ -37,10 +37,21 @@ loadProfile();
 function suit(){return suits.find(x=>x.id===profile.suit)||suits[0]}
 for(const a of suits)if((profile.dur[a.id]??a.max)>a.max)profile.dur[a.id]=a.max;saveProfile();
 function repairCost(a,d){return Math.max(0,Math.ceil((a.max-d)*a.repair))}
-function showMenu(){run=0;IGS.style.display="none";S.style.display="flex";S.innerHTML='<div class="card"><h1>🥷 NINJA JUMP</h1><p>🪙 Shop-Münzen: '+profile.bank+'</p><div class="menuBtns"><button id="play">▶️ SPIEL STARTEN</button><button id="shop">🛒 SHOP</button><button id="recs">🏆 REKORDE</button></div><p>Gute Tiere helfen dir. Böse Monster und ihre Helfer machen unterschiedlich viel Schaden.</p></div>';document.querySelector("#play").onclick=start;document.querySelector("#shop").onclick=showShop;document.querySelector("#recs").onclick=showRecords}
+function showMenu(){run=0;shopFromGame=false;IGS.style.display="none";S.style.display="flex";S.innerHTML='<div class="card"><h1>🥷 NINJA JUMP</h1><p>🪙 Shop-Münzen: '+profile.bank+'</p><div class="menuBtns"><button id="play">▶️ SPIEL STARTEN</button><button id="shop">🛒 SHOP</button><button id="recs">🏆 REKORDE</button></div><p>Gute Tiere helfen dir. Böse Monster und ihre Helfer machen unterschiedlich viel Schaden.</p></div>';document.querySelector("#play").onclick=start;document.querySelector("#shop").onclick=showShop;document.querySelector("#recs").onclick=showRecords}
 function showRecords(){let r=records(0);S.innerHTML='<div class="card"><h1>🏆 REKORDE</h1><p>Beste Zeit: '+(r.time?Math.floor(r.time/60)+'m '+(r.time%60)+'s':'—')+'<br>🪙 Münzrekord: '+r.coins+'<br>🏁 Höchstes Level: '+r.levels+'/'+TOTAL+'</p><button id="back">⬅️ HAUPTMENÜ</button></div>';document.querySelector("#back").onclick=()=>{if(inGame&&wasRunning){S.style.display="none";run=1;last=performance.now();IGS.style.display="block";requestAnimationFrame(loop)}else showMenu()}}
 function syncHelpers(){for(const h of helpers){let q=pets.find(p=>p.id===h.id);if(q){h.maxHp=Math.max(h.maxHp||0,q.hp);h.hp=Math.max(h.hp||0,Math.min(h.maxHp,q.hp));h.power=q.power;h.armor=suit().protect}}}
-function showShop(inGame=false){let wasRunning=!!run;if(inGame)run=0;let a=suit(),d=Math.min(a.max,profile.dur[a.id]??a.max),rc=repairCost(a,d);S.innerHTML='<div class="card"><h1>🛒 SHOP</h1><p>🪙 '+profile.bank+'<br>Aktiv: <b>'+a.name+'</b><br>🛡️ Zustand: '+d+'/'+a.max+'</p><div id="wares"></div><button id="repair" class="small">🔧 Reparieren ('+rc+' 🪙)</button><div id="pets"><p><b>🐾 TIER-HELFER</b></p></div><button id="back" class="small">⬅️ HAUPTMENÜ</button></div>';let w=document.querySelector("#wares");suits.forEach(x=>{let own=profile.owned.includes(x.id),dd=Math.min(x.max,profile.dur[x.id]??x.max);let b=document.createElement("button");b.className="small shopItem";b.innerHTML='<b>'+x.name+'</b>💰 Preis: '+x.price+' Münzen<br>Schutz '+x.protect+' · Haltbarkeit '+dd+'/'+x.max+(own?' · '+(profile.suit===x.id?'AKTIV':'ANZIEHEN'):' · KAUFEN');b.onclick=()=>{if(own){profile.suit=x.id}else if(profile.bank>=x.price){profile.bank-=x.price;profile.owned.push(x.id);profile.dur[x.id]=x.max;profile.suit=x.id}saveProfile();syncHelpers();showShop(inGame)};w.appendChild(b)});let pw=document.querySelector("#pets");pets.forEach(x=>{let own=profile.pets.includes(x.id),b=document.createElement("button");b.className="small shopItem";b.innerHTML="<b>"+x.name+"</b>💰 Preis: "+x.price+" Münzen<br>❤️ "+x.hp+" · Stärke "+x.power+(own?" · GEKAUFT":" · KAUFEN");b.disabled=own;b.onclick=()=>{if(!own&&profile.bank>=x.price){profile.bank-=x.price;profile.pets.push(x.id);saveProfile();if(inGame){let q=x;helpers.push({id:q.id,x:P.x-70-helpers.length*32,y:P.y,emoji:q.name.slice(0,2),cool:0,hp:q.hp,maxHp:q.hp,power:q.power,armor:suit().protect,on:1})}showShop(inGame)}};pw.appendChild(b)});document.querySelector("#repair").disabled=rc===0;document.querySelector("#repair").onclick=()=>{let x=suit(),dd=Math.min(x.max,profile.dur[x.id]??x.max),cost=repairCost(x,dd);if(cost&&profile.bank>=cost){profile.bank-=cost;profile.dur[x.id]=x.max;saveProfile();syncHelpers();showShop(inGame)}};document.querySelector("#back").onclick=()=>{if(inGame&&wasRunning){S.style.display="none";run=1;last=performance.now();IGS.style.display="block";requestAnimationFrame(loop)}else showMenu()}}
+function showShop(inGame=false){
+ if(inGame){shopFromGame=true;run=0}
+ let a=suit(),d=Math.min(a.max,profile.dur[a.id]??a.max),rc=repairCost(a,d);
+ S.style.display="flex";IGS.style.display="none";
+ S.innerHTML='<div class="card"><h1>🛒 SHOP</h1><p>🪙 '+profile.bank+'<br>Aktiv: <b>'+a.name+'</b><br>🛡️ Zustand: '+d+'/'+a.max+'</p><div id="wares"></div><button id="repair" class="small">🔧 Reparieren ('+rc+' 🪙)</button><div id="pets"><p><b>🐾 TIER-HELFER</b></p></div><button id="back" class="small">⬅️ '+(shopFromGame?'ZURÜCK ZUM SPIEL':'HAUPTMENÜ')+'</button></div>';
+ let w=document.querySelector("#wares");
+ suits.forEach(x=>{let own=profile.owned.includes(x.id),dd=Math.min(x.max,profile.dur[x.id]??x.max);let b=document.createElement("button");b.className="small shopItem";b.innerHTML='<b>'+x.name+'</b>💰 Preis: '+x.price+' Münzen<br>Schutz '+x.protect+' · Haltbarkeit '+dd+'/'+x.max+(own?' · '+(profile.suit===x.id?'AKTIV':'ANZIEHEN'):' · KAUFEN');b.onclick=()=>{if(own){profile.suit=x.id}else if(profile.bank>=x.price){profile.bank-=x.price;profile.owned.push(x.id);profile.dur[x.id]=x.max;profile.suit=x.id}saveProfile();syncHelpers();showShop(false)};w.appendChild(b)});
+ let pw=document.querySelector("#pets");
+ pets.forEach(x=>{let own=profile.pets.includes(x.id),b=document.createElement("button");b.className="small shopItem";b.innerHTML="<b>"+x.name+"</b>💰 Preis: "+x.price+" Münzen<br>❤️ "+x.hp+" · Stärke "+x.power+(own?" · GEKAUFT":" · KAUFEN");b.disabled=own;b.onclick=()=>{if(!own&&profile.bank>=x.price){profile.bank-=x.price;profile.pets.push(x.id);saveProfile();if(shopFromGame){let q=x;helpers.push({id:q.id,x:P.x-55-helpers.length*28,y:P.y,emoji:q.name.slice(0,2),cool:0,hurtCool:0,hp:q.hp,maxHp:q.hp,power:q.power,armor:suit().protect,on:1})}showShop(false)}};pw.appendChild(b)});
+ document.querySelector("#repair").disabled=rc===0;document.querySelector("#repair").onclick=()=>{let x=suit(),dd=Math.min(x.max,profile.dur[x.id]??x.max),cost=repairCost(x,dd);if(cost&&profile.bank>=cost){profile.bank-=cost;profile.dur[x.id]=x.max;saveProfile();syncHelpers();showShop(false)}};
+ document.querySelector("#back").onclick=()=>{if(shopFromGame){shopFromGame=false;S.style.display="none";IGS.style.display="block";run=1;last=performance.now();requestAnimationFrame(loop)}else showMenu()};
+}
 function armorHit(dmg){let a=suit(),d=profile.dur[a.id]??a.max;if(d>0){d=Math.max(0,d-Math.max(1,dmg-a.protect+1));profile.dur[a.id]=d;saveProfile();P.inv=55;hud();return true}return false}
 function hurt(dmg=1){if(P.inv)return;if(shield){shield=0;P.inv=80;hud();return}if(armorHit(dmg))return;for(let i=0;i<dmg;i++){lives--;if(lives<=0)break}hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
 
@@ -50,7 +61,7 @@ function hud(){let a=suit(),d=profile.dur[a.id]??a.max;LE.textContent=names[lv]+
 function addPlatform(x,y,w=150,m=0){
  // Spätere Level: bewegliche Plattformen werden etwas schneller, bleiben aber erreichbar.
  let speed=m?(1.05+Math.min(lv,19)*.035):0;
- platforms.push({x,y,w,h:22,m,base:x,v:speed,range:70})
+ platforms.push({x,y,w,h:22,m,base:x,baseY:y,v:speed,range:70,axis:(m&&lv>=10&&platforms.length%3===0)?"y":"x"})
 }
 function build(){
  let floor=H-86;underground=false;cam=0;checkpoint=40;
@@ -71,7 +82,7 @@ function build(){
  // Hohe Plattformen bleiben hoch; jeder notwendige Höhenunterschied ist trotzdem springbar.
  route.forEach((r,i)=>{
  // Schwierigkeit steigt stufenweise: ab Level 4 wenige, später mehr bewegliche Plattformen.
- let moving=lv>=3 && (i%(lv>=15?3:lv>=9?4:5)===3%(lv>=15?3:lv>=9?4:5));
+ let moving=lv>=3 && (i%(lv>=16?2:lv>=10?3:lv>=6?4:5)===3%(lv>=16?2:lv>=10?3:lv>=6?4:5));
  addPlatform(r[0],floor-r[1],r[2],moving);
  if(i%2===0)items.push({x:r[0]+r[2]/2,y:floor-r[1]-30,t:0})
 });
@@ -103,6 +114,7 @@ function build(){
  if(lv>=4)enemyHelpers.push({x:1550,y:floor-32,w:32,h:32,v:1.25,a:1470,b:1740,damage:2,emoji:"🦂",hp:2+Math.floor(lv/5),maxHp:2+Math.floor(lv/5),on:1});
  if(lv>=8)enemyHelpers.push({x:2200,y:floor-32,w:32,h:32,v:-1.35,a:2110,b:2390,damage:2+Math.floor(lv/10),emoji:"🐺",hp:3+Math.floor(lv/6),maxHp:3+Math.floor(lv/6),on:1});
  if(lv>=11)enemyHelpers.push({x:2700,y:floor-32,w:32,h:32,v:-1.5,a:2650,b:2940,damage:3,emoji:"🐍",hp:4+Math.floor(lv/5),maxHp:4+Math.floor(lv/5),on:1});
+ if(lv>=16)enemyHelpers.push({x:2950,y:floor-32,w:32,h:32,v:1.65,a:2880,b:3180,damage:4,emoji:"🕷️",hp:5+Math.floor(lv/5),maxHp:5+Math.floor(lv/5),on:1});
  goal={x:3400,y:floor-115,w:55,h:115};
  if(lv===2||lv===5||lv===9||lv===12||lv===15||lv===19)boss={x:3180,y:floor-86,w:86,h:86,v:1.35+lv*.025,a:3070,b:3340,hp:lv===19?8:(lv>=15?6:lv>=9?5:3),on:1};
  hud()
@@ -127,6 +139,9 @@ function bind(id,k){
  e.addEventListener("lostpointercapture",()=>I[k]=0,{passive:false});
 }
 bind("#L","l");bind("#R","r");bind("#J","j");bind("#D","d");bind("#V","v");
+const keyMap={ArrowLeft:"l",ArrowRight:"r",ArrowUp:"j",Space:"j",Enter:"d"};
+addEventListener("keydown",e=>{let k=keyMap[e.code];if(!k)return;e.preventDefault();if(k==="j"&&!e.repeat)I.j=1;else if(k==="d"&&!e.repeat)I.d=1;else I[k]=1},{passive:false});
+addEventListener("keyup",e=>{let k=keyMap[e.code];if(!k)return;e.preventDefault();if(k!=="j"&&k!=="d")I[k]=0},{passive:false});
 // Wichtig auf dem iPhone: mehrere Finger bleiben unabhängig aktiv.
 // Deshalb gibt es absichtlich KEIN globales pointerup, das alle Tasten zurücksetzt.
 
@@ -159,14 +174,14 @@ function update(){
  if(I.j&&P.on){P.vy=jumpPower?-15.2:-13.6;P.on=0}I.j=0;if(I.d){enterPipe();I.d=0}
  P.vy=Math.min(15,P.vy+(floatPower?.34:.64));if(floatPower>0)floatPower--;if(jumpPower>0)jumpPower--;P.x=Math.max(0,P.x+P.vx);P.y+=P.vy;P.on=0;
  let active=underground?undergroundPlatforms():platforms;
- for(const a of active){if(a.m){a.x+=a.v;if(Math.abs(a.x-a.base)>a.range)a.v=-a.v}if(P.vy>=0&&P.x+P.w>a.x&&P.x<a.x+a.w&&P.y+P.h>=a.y&&P.y+P.h-P.vy<=a.y+8){P.y=a.y-P.h;P.vy=0;P.on=1;if(a.m)P.x+=a.v}}
+ for(const a of active){if(a.m){if(a.axis==="y"){a.y+=a.v;if(Math.abs(a.y-a.baseY)>45)a.v=-a.v}else{a.x+=a.v;if(Math.abs(a.x-a.base)>a.range)a.v=-a.v}}if(P.vy>=0&&P.x+P.w>a.x&&P.x<a.x+a.w&&P.y+P.h>=a.y&&P.y+P.h-P.vy<=a.y+8){P.y=a.y-P.h;P.vy=0;P.on=1;if(a.m&&a.axis!=="y")P.x+=a.v}}
  if(P.y>H+70){respawn();return}if(P.inv)P.inv--;
  if(!underground){
    for(const s of spikes)if(hit(P,s)&&!P.inv)respawn();
    for(const m of monsters)if(m.on){m.x+=m.v;if(m.x<m.a||m.x>m.b)m.v=-m.v;if(hit(P,m)&&!P.inv){if(P.vy>1&&P.y+P.h-m.y<27){m.hp=(m.hp||1)-1;if(m.hp<=0){m.on=0;coins+=2}P.vy=-9;hud()}else hurt(m.damage||1)}}
    for(const o of items)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<950){o.t=1;coins++;hud()}}
    for(const e of enemyHelpers)if(e.on){e.x+=e.v;if(e.x<e.a||e.x>e.b)e.v=-e.v;if(hit(P,e)&&!P.inv){let armored=(profile.dur[suit().id]??suit().max)>0;if(armored&&P.vy>1&&P.y+P.h-e.y<28){e.hp--;P.vy=-9;P.inv=28;if(e.hp<=0){e.on=0;coins+=3;hud()}}else hurt(e.damage)}}
-   for(const h of helpers){if(!h.on)continue;h.x+=(P.x-65-h.x)*.07;h.y+=(P.y+10-h.y)*.07;if(h.cool>0)h.cool--;if(h.hurtCool>0)h.hurtCool--;let near=t=>t.on&&Math.abs(t.x-P.x)<260&&Math.abs(t.x-h.x)<150;let e=enemyHelpers.find(near),m=monsters.find(near),target=e||m;if(target&&!h.cool&&Math.abs(target.x-h.x)<65){target.hp=(target.hp||1)-h.power;if(target.hp<=0){target.on=0;coins+=1;hud()}h.cool=70}if(target&&!h.hurtCool&&Math.abs(target.x-h.x)<28&&Math.abs(target.y-h.y)<38){let dmg=Math.max(1,(target.damage||1)-(h.armor||0));h.hp-=dmg;h.hurtCool=90;if(h.hp<=0){h.hp=0;h.on=0}}}
+   for(const h of helpers){if(!h.on)continue;h.x+=(P.x-55-h.x)*.09;h.y+=(P.y+10-h.y)*.09;if(h.cool>0)h.cool--;if(h.hurtCool>0)h.hurtCool--;let near=t=>t.on&&t.x>=P.x-5&&t.x<=P.x+180&&t.x>=h.x-5&&t.x<=h.x+70;let e=enemyHelpers.find(near),m=monsters.find(near),target=e||m;if(target&&!h.cool&&target.x-h.x>=-5&&target.x-h.x<52){target.hp=(target.hp||1)-h.power;if(target.hp<=0){target.on=0;coins+=1;hud()}h.cool=70}if(target&&!h.hurtCool&&Math.abs(target.x-h.x)<26&&Math.abs(target.y-h.y)<38){let dmg=Math.max(1,(target.damage||1)-(h.armor||0));h.hp-=dmg;h.hurtCool=90;if(h.hp<=0){h.hp=0;h.on=0}}}
    if(boss&&boss.on){boss.x+=boss.v;if(boss.x<boss.a||boss.x>boss.b)boss.v=-boss.v;if(hit(P,boss)&&!P.inv){if(P.vy>1&&P.y+P.h-boss.y<31){boss.hp--;P.vy=-11;P.inv=32;if(!boss.hp){boss.on=0;coins+=15;lives++;for(const h of helpers){h.maxHp++;h.hp=Math.min(h.maxHp,h.hp+1)}bossKills++;hud()}}else hurt(3+Math.floor(lv/10))}}
    if(P.x>1900&&checkpoint<1900)checkpoint=1950;
    if(hit(P,goal)&&(!boss||!boss.on)){levelChest();return}
@@ -205,7 +220,7 @@ function draw(){
  ninja();G.restore()
 }
 function loop(t){if(!run)return;let n=Math.min(3,Math.max(1,Math.round((t-last)/16.7)));last=t;while(n--)update();if(run){draw();requestAnimationFrame(loop)}}build();draw();
-IGS.onclick=()=>{if(run)showShop(true)};
+IGS.onclick=e=>{e.preventDefault();e.stopPropagation();if(run)showShop(true)};
 showMenu();
 })();
 </script></body></html>
