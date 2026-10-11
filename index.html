@@ -4,11 +4,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><title>Ninja Jump 4</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:calc(100dvh - 86px)}body::after{content:"";position:fixed;z-index:6;left:0;right:0;bottom:0;height:86px;background:#07111d;border-top:1px solid #ffffff22;pointer-events:none}
+button,.btn,canvas{-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important;-webkit-user-drag:none!important;touch-action:none!important}html,body{margin:0;height:100%;overflow:hidden;background:#07111d;font-family:system-ui;touch-action:none;-webkit-touch-callout:none!important;-webkit-user-select:none!important;user-select:none!important}canvas{display:block;width:100vw;height:calc(100dvh - 82px)}body::after{content:"";position:fixed;z-index:6;left:0;right:0;bottom:0;height:82px;background:#07111d;border-top:1px solid #ffffff22;pointer-events:none}
 #hud{position:fixed;z-index:7;top:max(10px,env(safe-area-inset-top));left:12px;right:12px;display:flex;justify-content:space-between;color:#fff;font-weight:900;text-shadow:0 2px 5px #000;font-size:15px}
-.btn{position:fixed;z-index:8;bottom:max(7px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
+.btn{position:fixed;z-index:8;bottom:max(6px,env(safe-area-inset-bottom));border:2px solid #ffffff99;border-radius:50%;background:#111827dd;color:white;font-weight:900;touch-action:none}
 #L,#R{width:56px;height:56px;font-size:22px}#L{left:8px}#R{left:70px}#V{left:132px;width:66px;height:56px;border-radius:19px;font-size:10px}#J{right:8px;width:66px;height:66px;background:#b45309dd;font-size:12px}#D{right:80px;width:62px;height:56px;background:#047857dd;font-size:10px}
-#screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:center;justify-content:center;padding:22px;touch-action:pan-y}.card{width:min(460px,100%);max-height:calc(100dvh - 44px);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain;background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950;touch-action:manipulation}.card p{line-height:1.45;color:#dbeafe}.menuBtns{display:grid;gap:10px}.small{font-size:14px!important;padding:12px!important}.shopItem{margin:9px 0;padding:10px;border:1px solid #ffffff33;border-radius:14px;background:#0b1220}.shopItem b{display:block}.good{color:#86efac}.bad{color:#fca5a5}
+#screen{position:fixed;z-index:20;inset:0;background:#020617ee;color:#fff;display:flex;align-items:flex-start;justify-content:center;padding:18px 18px 34px;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}.card{width:min(460px,100%);max-height:none;overflow:visible;touch-action:pan-y;background:#111827;padding:25px;border-radius:25px;text-align:center;border:1px solid #ffffff33}.card button{width:100%;padding:17px;border:0;border-radius:15px;background:#fbbf24;font-size:20px;font-weight:950;touch-action:pan-y}.card p{line-height:1.45;color:#dbeafe}.menuBtns{display:grid;gap:10px}.small{font-size:14px!important;padding:12px!important}.shopItem{margin:9px 0;padding:10px;border:1px solid #ffffff33;border-radius:14px;background:#0b1220}.shopItem b{display:block}.good{color:#86efac}.bad{color:#fca5a5}
  #ingameShop{position:fixed;z-index:9;top:max(48px,env(safe-area-inset-top));right:10px;padding:8px 11px;border:1px solid #ffffff88;border-radius:14px;background:#111827dd;color:#fff;font-weight:900;font-size:12px;display:none}</style></head><body>
 <canvas id="c"></canvas><button id="ingameShop">🛒 SHOP</button><div id="hud"><span id="level"></span><span id="stat"></span></div>
 <button class="btn" id="L" oncontextmenu="return false" onselectstart="return false">◀</button><button class="btn" id="R" oncontextmenu="return false" onselectstart="return false">▶</button><button class="btn" id="V" oncontextmenu="return false" onselectstart="return false">SCHAU<br>👀</button><button class="btn" id="D" oncontextmenu="return false" onselectstart="return false">RÖHRE<br>▼</button><button class="btn" id="J" oncontextmenu="return false" onselectstart="return false">SPRING</button>
@@ -23,11 +23,11 @@ document.addEventListener("touchstart",e=>{if(e.target.closest?.(".btn")){e.prev
 document.addEventListener("touchmove",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 document.addEventListener("touchend",e=>{if(e.target.closest?.(".btn"))e.preventDefault()},{passive:false,capture:true});
 const C=document.querySelector("#c"),G=C.getContext("2d"),S=document.querySelector("#screen"),LE=document.querySelector("#level"),ST=document.querySelector("#stat"),IGS=document.querySelector("#ingameShop");
-let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0,startTime=0,bossKills=0,shield=0,floatPower=0,jumpPower=0,helpers=[],enemyHelpers=[],shopFromGame=false;
+let W,H,D,run=0,last=0,lv=0,coins=0,lives=5,cam=0,underground=false,checkpoint=40,lookMode=false,lookCam=0,facing=1,startTime=0,bossKills=0,shield=0,floatPower=0,jumpPower=0,helpers=[],enemyHelpers=[],shopFromGame=false;
 const TOTAL=20;
 const I={l:0,r:0,j:0,d:0,v:0}, names=["🌳 Wald","🏜️ Wüste","❄️ Eis","🌙 Nachtwald","🌋 Vulkan","☁️ Himmel","🍄 Höhlen","🏯 Tempel","🔥 Dämonentor","🏰 Schattenburg","🌧️ Sturmwald","🦂 Canyon","🧊 Gletscher","🌌 Sternennacht","🌋 Lavahöhle","🌪️ Wolkensturm","💎 Kristallhöhle","⛩️ Ninja-Tempel","👺 Dämonenpfad","👑 Kaiserburg"];
 const skies=["#60a5fa","#e9a84a","#b8e5f4","#172554","#7f1d1d","#60a5fa","#43385c","#9f6d4d","#431407","#334155","#475569","#c08457","#dbeafe","#1e1b4b","#991b1b","#64748b","#312e81","#7c2d12","#450a0a","#1f2937"];
-let P,platforms,monsters,items,spikes,pipes,goal,boss,pits,tunnelCoins,tunnelMonsters,tunnelObstacles,pipeTarget=null;
+let P,platforms,monsters,items,spikes,pipes,goal,boss,pits,tunnelCoins,tunnelMonsters,tunnelObstacles,boostPads,fallingPlatforms,pipeTarget=null;
 const suits=[{id:"cloth",name:"🥷 Stoffanzug",price:0,max:3,protect:1,repair:5},{id:"leather",name:"🟤 Lederanzug",price:60,max:7,protect:2,repair:7},{id:"iron",name:"⚙️ Eisenanzug",price:150,max:12,protect:3,repair:10},{id:"shadow",name:"🌑 Schattenrüstung",price:300,max:18,protect:4,repair:14}];
 let profile={bank:222,owned:["cloth"],suit:"cloth",dur:{cloth:12},pets:[]};
 const pets=[{id:"dog",name:"🐕 Ninja-Hund",price:70,hp:12,power:2},{id:"cat",name:"🐈 Schatten-Katze",price:100,hp:7,power:2},{id:"fox",name:"🦊 Kampf-Fuchs",price:140,hp:9,power:3},{id:"owl",name:"🦉 Wächter-Eule",price:190,hp:10,power:3},{id:"eagle",name:"🦅 Himmels-Adler",price:260,hp:12,power:4},{id:"tiger",name:"🐅 Ninja-Tiger",price:380,hp:15,power:5}];
@@ -56,17 +56,17 @@ function armorHit(dmg){let a=suit(),d=profile.dur[a.id]??a.max;if(d>0){d=Math.ma
 function hurt(dmg=1){if(P.inv)return;if(shield){shield=0;P.inv=80;hud();return}if(armorHit(dmg))return;for(let i=0;i<dmg;i++){lives--;if(lives<=0)break}hud();if(lives<=0){end("💥 Game Over","NOCHMAL");return}P.x=checkpoint;P.y=H-180;P.vx=P.vy=0;P.inv=100;underground=false}
 
 
-function resize(){W=innerWidth;H=Math.max(300,innerHeight-86);D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
+function resize(){W=innerWidth;H=Math.max(300,innerHeight-82);D=Math.min(devicePixelRatio||1,2);C.width=W*D;C.height=H*D;G.setTransform(D,0,0,D,0,0)}addEventListener("resize",resize);resize();
 function hud(){let a=suit(),d=profile.dur[a.id]??a.max;LE.textContent=names[lv]+" · "+(lv+1)+"/"+TOTAL;ST.textContent="🪙 "+coins+"　❤️ "+lives+"　🛡️ "+d}
 function addPlatform(x,y,w=150,m=0){
  // Spätere Level: bewegliche Plattformen werden etwas schneller, bleiben aber erreichbar.
  let speed=m?(1.05+Math.min(lv,19)*.035):0;
- platforms.push({x,y,w,h:22,m,base:x,baseY:y,v:speed,range:70,axis:(m&&lv>=10&&platforms.length%3===0)?"y":"x"})
+ platforms.push({x,y,w,h:22,m,base:x,baseY:y,v:speed,range:(lv>=14?105:lv>=8?85:70),axis:(m&&lv>=10&&platforms.length%3===0)?"y":"x"})
 }
 function build(){
- let floor=H-86;underground=false;cam=0;checkpoint=40;
+ let floor=H-20;underground=false;cam=0;checkpoint=40;
  P={x:40,y:floor-55,w:38,h:50,vx:0,vy:0,on:0,inv:0};
- platforms=[];monsters=[];items=[];spikes=[];pipes=[];pits=[];tunnelCoins=[];tunnelMonsters=[];tunnelObstacles=[];helpers=[];enemyHelpers=[];boss=null;pipeTarget=null;
+ platforms=[];monsters=[];items=[];spikes=[];pipes=[];pits=[];tunnelCoins=[];tunnelMonsters=[];tunnelObstacles=[];boostPads=[];fallingPlatforms=[];helpers=[];enemyHelpers=[];boss=null;pipeTarget=null;
  // Floor is split into sections, creating real pits.
  let sections=[[0,520],[650,520],[1300,500],[1950,560],[2670,880]];
  sections.forEach(s=>platforms.push({x:s[0],y:floor,w:s[1],h:120}));
@@ -108,12 +108,16 @@ function build(){
  tunnelMonsters=[{x:430,y:H-116,w:38,h:36,v:ts,a:390,b:560,on:1},{x:900,y:H-116,w:38,h:36,v:-1.1*ts,a:850,b:1030,on:1},{x:1370,y:H-116,w:38,h:36,v:1.15*ts,a:1320,b:1510,on:1}];
  if(lv>=10)tunnelMonsters.push({x:1160,y:H-116,w:38,h:36,v:-1.2*ts,a:1130,b:1280,on:1});
  tunnelObstacles=[{x:610,y:H-132,w:55,h:52},{x:1080,y:H-152,w:62,h:72},{x:1530,y:H-142,w:58,h:62}];
+ // Neue Level-Funktionen: ab Level 7 Sprungfedern, ab Level 12 schwebende Extra-Plattformen.
+ if(lv>=6)boostPads=[{x:760,y:floor-10,w:58,h:10},{x:2240,y:floor-10,w:58,h:10}];
+ if(lv>=11)fallingPlatforms=[{x:1540,y:floor-210,w:110,h:18,baseY:floor-210,v:1.15+lv*.03,range:65},{x:2860,y:floor-250,w:105,h:18,baseY:floor-250,v:-(1.1+lv*.03),range:70}];
  // Freundliche Tiere: begleiten den Ninja und erledigen gelegentlich einen normalen Gegner.
  profile.pets.forEach((id,i)=>{let q=pets.find(p=>p.id===id);if(q)helpers.push({id:q.id,x:90+i*35,y:floor-45,emoji:q.name.slice(0,2),cool:0,hp:q.hp,maxHp:q.hp,power:q.power,armor:suit().protect,on:1})});
  // Helfer der bösen Monster; spätere Level bekommen mehr und stärkere.
  if(lv>=4)enemyHelpers.push({x:1550,y:floor-32,w:32,h:32,v:1.25,a:1470,b:1740,damage:2,emoji:"🦂",hp:2+Math.floor(lv/5),maxHp:2+Math.floor(lv/5),on:1});
  if(lv>=8)enemyHelpers.push({x:2200,y:floor-32,w:32,h:32,v:-1.35,a:2110,b:2390,damage:2+Math.floor(lv/10),emoji:"🐺",hp:3+Math.floor(lv/6),maxHp:3+Math.floor(lv/6),on:1});
  if(lv>=11)enemyHelpers.push({x:2700,y:floor-32,w:32,h:32,v:-1.5,a:2650,b:2940,damage:3,emoji:"🐍",hp:4+Math.floor(lv/5),maxHp:4+Math.floor(lv/5),on:1});
+ if(lv>=14)enemyHelpers.push({x:1200,y:floor-32,w:32,h:32,v:1.55,a:1130,b:1320,damage:3,emoji:"🦎",hp:4+Math.floor(lv/5),maxHp:4+Math.floor(lv/5),on:1});
  if(lv>=16)enemyHelpers.push({x:2950,y:floor-32,w:32,h:32,v:1.65,a:2880,b:3180,damage:4,emoji:"🕷️",hp:5+Math.floor(lv/5),maxHp:5+Math.floor(lv/5),on:1});
  goal={x:3400,y:floor-115,w:55,h:115};
  if(lv===2||lv===5||lv===9||lv===12||lv===15||lv===19)boss={x:3180,y:floor-86,w:86,h:86,v:1.35+lv*.025,a:3070,b:3340,hp:lv===19?8:(lv>=15?6:lv>=9?5:3),on:1};
@@ -139,9 +143,9 @@ function bind(id,k){
  e.addEventListener("lostpointercapture",()=>I[k]=0,{passive:false});
 }
 bind("#L","l");bind("#R","r");bind("#J","j");bind("#D","d");bind("#V","v");
-const keyMap={ArrowLeft:"l",ArrowRight:"r",ArrowUp:"j",Space:"j",Enter:"d"};
-addEventListener("keydown",e=>{let k=keyMap[e.code];if(!k)return;e.preventDefault();if(k==="j"&&!e.repeat)I.j=1;else if(k==="d"&&!e.repeat)I.d=1;else I[k]=1},{passive:false});
-addEventListener("keyup",e=>{let k=keyMap[e.code];if(!k)return;e.preventDefault();if(k!=="j"&&k!=="d")I[k]=0},{passive:false});
+function keyControl(e){let code=e.code||e.key;return ({ArrowLeft:"l",ArrowRight:"r",ArrowUp:"j",Space:"j"," ":"j",Enter:"d"})[code]}
+addEventListener("keydown",e=>{let k=keyControl(e);if(!k)return;e.preventDefault();if(k==="j"&&!e.repeat)I.j=1;else if(k==="d"&&!e.repeat)I.d=1;else I[k]=1},{passive:false});
+addEventListener("keyup",e=>{let k=keyControl(e);if(!k)return;e.preventDefault();if(k!=="j"&&k!=="d")I[k]=0},{passive:false});
 // Wichtig auf dem iPhone: mehrere Finger bleiben unabhängig aktiv.
 // Deshalb gibt es absichtlich KEIN globales pointerup, das alle Tasten zurücksetzt.
 
@@ -170,18 +174,20 @@ function update(){
    // Im SCHAU-Modus steuern die Pfeile ausschließlich die Kamera.
    return;
  } else if(lookMode){lookMode=false;I.l=0;I.r=0;cam=Math.max(0,Math.min(P.x-W*.3,Math.max(0,(underground?1850:3550)-W)))}
- if(I.l)P.vx=Math.max(-5.8,P.vx-.72);if(I.r)P.vx=Math.min(5.8,P.vx+.72);if(!I.l&&!I.r)P.vx*=.78;
+ if(I.l){P.vx=Math.max(-5.8,P.vx-.72);facing=-1}if(I.r){P.vx=Math.min(5.8,P.vx+.72);facing=1}if(!I.l&&!I.r)P.vx*=.78;
  if(I.j&&P.on){P.vy=jumpPower?-15.2:-13.6;P.on=0}I.j=0;if(I.d){enterPipe();I.d=0}
  P.vy=Math.min(15,P.vy+(floatPower?.34:.64));if(floatPower>0)floatPower--;if(jumpPower>0)jumpPower--;P.x=Math.max(0,P.x+P.vx);P.y+=P.vy;P.on=0;
  let active=underground?undergroundPlatforms():platforms;
+ if(!underground&&fallingPlatforms.length){for(const a of fallingPlatforms){a.y+=a.v;if(Math.abs(a.y-a.baseY)>a.range)a.v=-a.v}active=active.concat(fallingPlatforms)}
  for(const a of active){if(a.m){if(a.axis==="y"){a.y+=a.v;if(Math.abs(a.y-a.baseY)>45)a.v=-a.v}else{a.x+=a.v;if(Math.abs(a.x-a.base)>a.range)a.v=-a.v}}if(P.vy>=0&&P.x+P.w>a.x&&P.x<a.x+a.w&&P.y+P.h>=a.y&&P.y+P.h-P.vy<=a.y+8){P.y=a.y-P.h;P.vy=0;P.on=1;if(a.m&&a.axis!=="y")P.x+=a.v}}
+ if(!underground)for(const b of boostPads){if(P.vy>=0&&P.x+P.w>b.x&&P.x<b.x+b.w&&P.y+P.h>=b.y&&P.y+P.h-P.vy<=b.y+12){P.y=b.y-P.h;P.vy=-17.2;P.on=0}}
  if(P.y>H+70){respawn();return}if(P.inv)P.inv--;
  if(!underground){
    for(const s of spikes)if(hit(P,s)&&!P.inv)respawn();
    for(const m of monsters)if(m.on){m.x+=m.v;if(m.x<m.a||m.x>m.b)m.v=-m.v;if(hit(P,m)&&!P.inv){if(P.vy>1&&P.y+P.h-m.y<27){m.hp=(m.hp||1)-1;if(m.hp<=0){m.on=0;coins+=2}P.vy=-9;hud()}else hurt(m.damage||1)}}
    for(const o of items)if(!o.t){let dx=P.x+19-o.x,dy=P.y+25-o.y;if(dx*dx+dy*dy<950){o.t=1;coins++;hud()}}
    for(const e of enemyHelpers)if(e.on){e.x+=e.v;if(e.x<e.a||e.x>e.b)e.v=-e.v;if(hit(P,e)&&!P.inv){let armored=(profile.dur[suit().id]??suit().max)>0;if(armored&&P.vy>1&&P.y+P.h-e.y<28){e.hp--;P.vy=-9;P.inv=28;if(e.hp<=0){e.on=0;coins+=3;hud()}}else hurt(e.damage)}}
-   for(const h of helpers){if(!h.on)continue;h.x+=(P.x-55-h.x)*.09;h.y+=(P.y+10-h.y)*.09;if(h.cool>0)h.cool--;if(h.hurtCool>0)h.hurtCool--;let near=t=>t.on&&t.x>=P.x-5&&t.x<=P.x+180&&t.x>=h.x-5&&t.x<=h.x+70;let e=enemyHelpers.find(near),m=monsters.find(near),target=e||m;if(target&&!h.cool&&target.x-h.x>=-5&&target.x-h.x<52){target.hp=(target.hp||1)-h.power;if(target.hp<=0){target.on=0;coins+=1;hud()}h.cool=70}if(target&&!h.hurtCool&&Math.abs(target.x-h.x)<26&&Math.abs(target.y-h.y)<38){let dmg=Math.max(1,(target.damage||1)-(h.armor||0));h.hp-=dmg;h.hurtCool=90;if(h.hp<=0){h.hp=0;h.on=0}}}
+   for(const h of helpers){if(!h.on)continue;let followX=P.x-facing*(52+helpers.indexOf(h)*24);h.x+=(followX-h.x)*.11;h.y+=(P.y+10-h.y)*.10;if(h.cool>0)h.cool--;if(h.hurtCool>0)h.hurtCool--;let inFront=t=>{if(!t.on)return false;let dx=t.x-h.x,playerDx=t.x-P.x;return facing*dx>=0&&facing*dx<=65&&facing*playerDx>=-10&&facing*playerDx<=115&&Math.abs(t.y-h.y)<55};let e=enemyHelpers.find(inFront),m=monsters.find(inFront),target=e||m;if(target&&!h.cool){target.hp=(target.hp||1)-h.power;if(target.hp<=0){target.on=0;coins+=1;hud()}h.cool=70}if(target&&!h.hurtCool&&Math.abs(target.x-h.x)<25&&Math.abs(target.y-h.y)<38){let dmg=Math.max(1,(target.damage||1)-(h.armor||0));h.hp-=dmg;h.hurtCool=90;if(h.hp<=0){h.hp=0;h.on=0}}}
    if(boss&&boss.on){boss.x+=boss.v;if(boss.x<boss.a||boss.x>boss.b)boss.v=-boss.v;if(hit(P,boss)&&!P.inv){if(P.vy>1&&P.y+P.h-boss.y<31){boss.hp--;P.vy=-11;P.inv=32;if(!boss.hp){boss.on=0;coins+=15;lives++;for(const h of helpers){h.maxHp++;h.hp=Math.min(h.maxHp,h.hp+1)}bossKills++;hud()}}else hurt(3+Math.floor(lv/10))}}
    if(P.x>1900&&checkpoint<1900)checkpoint=1950;
    if(hit(P,goal)&&(!boss||!boss.on)){levelChest();return}
@@ -198,7 +204,7 @@ function ninja(){G.save();if(P.inv&&Math.floor(P.inv/5)%2)G.globalAlpha=.3;G.fil
 function drawHearts(x,y,n,color){G.font="13px sans-serif";let heart=color==="#38bdf8"?"💙":"🖤";G.fillText(heart.repeat(Math.max(0,Math.min(n,8))),x,y)}
 function draw(){
  G.fillStyle=underground?"#17121f":skies[lv];G.fillRect(0,0,W,H);G.save();G.translate(-cam,0);
- let active=underground?undergroundPlatforms():platforms;
+ let active=underground?undergroundPlatforms():platforms.concat(fallingPlatforms);
  for(const a of active){G.fillStyle=underground?"#51435c":"#35654a";G.fillRect(a.x,a.y,a.w,a.h);G.fillStyle="#ffffff30";G.fillRect(a.x,a.y,a.w,6)}
  if(underground){
    // Ausgangsröhre steht ganz hinten im Tunnel.
@@ -210,6 +216,7 @@ function draw(){
    for(const b of tunnelObstacles){G.fillStyle="#ef4444";G.beginPath();G.moveTo(b.x,b.y+b.h);G.lineTo(b.x+b.w*.5,b.y);G.lineTo(b.x+b.w,b.y+b.h);G.fill()}
    G.fillStyle="#fff";G.font="bold 18px sans-serif";G.fillText("Geheimtunnel: Münzen • Schleime • Ausgang →",90,70);
  }else{
+   for(const b of boostPads){G.fillStyle="#f59e0b";G.fillRect(b.x,b.y,b.w,b.h);G.fillStyle="#fde047";for(let q=4;q<b.w;q+=14)G.fillRect(b.x+q,b.y-5,7,5)}
    for(const t of pipes){G.fillStyle="#15803d";G.fillRect(t.x,t.y,t.w,t.h);G.fillStyle="#22c55e";G.fillRect(t.x-7,t.y,t.w+14,18)}
    for(const s of spikes){G.fillStyle="#d1d5db";for(let z=0;z<s.w;z+=15){G.beginPath();G.moveTo(s.x+z,s.y+s.h);G.lineTo(s.x+z+7.5,s.y);G.lineTo(s.x+z+15,s.y+s.h);G.fill()}}
    for(const o of items)if(!o.t){G.fillStyle="#facc15";G.beginPath();G.arc(o.x,o.y,10,0,7);G.fill()}
